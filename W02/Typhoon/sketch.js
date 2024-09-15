@@ -1,20 +1,32 @@
 let frame1;
-let amount = 100;
+let amount = 300;
 let particles = [];
-let fields = [];
-let wBlockNum = 30;
-let hBlockNum;
-let blockSize;
+let scale = 0.002;
+let img;
+let ui = {
+  moveBG: false,
+  amount: 300,
+  southEarth: false,
+}
+
+
 
 function setup() {
   frame1 = createCanvas(windowWidth, windowHeight);
-  blockSize = frame1.width / wBlockNum;
-  hBlockNum = ceil(frame1.height / blockSize);
-  for (let i = 0; i < amount; i++) {
+  img = noiseImage();
+  ui.amount = frame1.height;
+  let gui = new dat.GUI();
+  gui.add(ui, 'moveBG').listen();
+  gui.add(ui, 'amount', 0, 2000).listen();
+  gui.add(ui, 'southEarth').listen();
+  // drawNoiseImage();
+  // image(img, 0, 0);
+  for (let i = 0; i < ui.amount; i++) {
     particles[i] = new Particle(
-      random(windowWidth),
-      random(windowHeight),
-      random(5)
+      random(frame1.width),
+      random(frame1.height),
+      3,
+      random(100, 500)
     );
   }
   // for (let i = 0; i < wBlockNum * hBlockNum; i++) {
@@ -24,116 +36,140 @@ function setup() {
   //     blockSize
   //   );
   // }
-  for (let i = 0; i < wBlockNum; i++) {
-    for (let j = 0; j < hBlockNum; j++) {
-      fields.push(new Field(
-        j,
-        i,
-        blockSize
-      ));
-    }
-  }
+
 }
 
 function draw() {
+  // background(0, 10);
 
-  // text(mouseX, 0, 0);
-  for (let j = 0; j < fields.length; j++) {
-    fields[j].update(j);
-    fields[j].display();
+  tint(255, 50);
+  // img = noiseImage();
+  image(img, 0, 0);
+  // if (mouseIsPressed){
+  // text(pow(noise(mouseX * scale, mouseY * scale) + 0.1, 3) * 500, mouseX, mouseY);
+  // }
+  while (particles.length < ui.amount) {
+    particles.push(new Particle(
+      random(frame1.width),
+      random(frame1.height),
+      3,
+      random(100, 500)
+    ));
   }
-  background(255, 1);
-  for (let i = 0; i < amount; i++) {
+
+  for (let i = 0; i < ui.amount; i++) {
     if (particles[i].isAlive()) {
       particles[i].update();
       particles[i].display();
     }
     else {
       particles[i] = new Particle(
-        windowWidth,
-        random(windowHeight),
-        random(5)
+       random(frame1.width),
+        random(frame1.height),
+        3,
+        random(100, 500)
       );
     }
   }
+  // text(pow(-noise(mouseX * scale, mouseY * scale), 2) * 360, mouseX, mouseY);
 }
 
 
-class Field {
-  constructor(w, h, size) {
-    this.pos = createVector(w * blockSize + blockSize / 2, h * blockSize + blockSize / 2);
-    this.vector = createVector();
-    this.size = size;
-    this.num = createVector(w, h);
-    this.FREQ_POS = 0.01;
-    this.FREQ_SPD = 0.01;
-    this.fieldNum = wBlockNum * this.num.y + this.num.x;
+function noiseImage() {
+  let noiseImg = createImage(frame1.width, frame1.height);
+  noiseImg.loadPixels();
+  for (let i = 0; i < frame1.width; i++) {
+    for (let j = 0; j < frame1.height; j++) {
+      let c = pow(noise(i * scale, j * scale, frameCount * 0.01), 2) * 400;
+      noiseImg.pixels[(i+j*noiseImg.width)*4] = 255 - c;
+      noiseImg.pixels[(i+j*noiseImg.width)*4+1] = c/2;
+      noiseImg.pixels[(i+j*noiseImg.width)*4+2] = c*2;
+      noiseImg.pixels[(i+j*noiseImg.width)*4+3] = 255;
+    }
   }
+  noiseImg.updatePixels();
+  return noiseImg;
+}
 
-  update(i) {
-    let xFreq = this.pos.x * this.FREQ_POS + 1 * this.FREQ_SPD;
-    let yFreq = this.pos.y * this.FREQ_POS + 1 * this.FREQ_SPD;
-    let noiseValue = noise(xFreq, yFreq);
-    let angle = map(noiseValue, 0, 1, 0, TWO_PI);
-    this.vector = createVector(xFreq * 2 - 1, yFreq * 2 - 1).normalize();
-    this.vector = p5.Vector.fromAngle(angle);
-    // this.vector = createVector(noise(frameCount / 100 + i) * 2 - 1, noise(frameCount / 100 + i + 1) * 2 - 1).normalize();
+function drawNoiseImage() {
+  // let noiseImg = createImage(windowWidth, windowHeight);
+  // noiseImg.loadPixels();
+  for (let i = 0; i < frame1.width; i++) {
+    for (let j = 0; j < frame1.height; j++) {
+      let c = pow(noise(i * scale, j * scale), 2) * 360;
+      push();
+      colorMode(HSL);
+      stroke(c%360, 100, 50, 1);
+      point(i, j);
+      pop()
+    }
   }
-
-  display() {
-    push();
-    rectMode(CENTER);
-    translate(this.pos.x, this.pos.y);
-    // circle(0, 0, 5);
-    rect(0, 0, this.size, this.size);
-    line(0, 0, this.vector.x * this.size / 2, this.vector.y * this.size / 2);
-    text(wBlockNum * this.num.y + this.num.x, 0, 0);
-    pop();
-  }
+  // noiseImg.updatePixels();
+  // return noiseImg;
 }
 
 
 class Particle {
-  constructor(posX, posY, size) {
+  constructor(posX, posY, size, lifespan) {
     this.pos = createVector(posX, posY);
     this.size = size;
     this.speed = createVector();
     this.alive = true;
+    this.lifecount = 0;
+    this.lifespan = lifespan
+    this.hue = pow(-noise(this.pos.x * scale, this.pos.y * scale), 2) * 360;
+    this.close = this.hue
   }
 
   display() {
     push()
+    // colorMode(HSL);
     translate(this.pos.x, this.pos.y);
-    fill(0);
+    fill(255);
+    // fill(this.hue, 100, 50, 1- (this.hue%360)/360);
     noStroke();
     circle(0, 0, this.size);
     pop();
   }
 
+  calDirection(x, y) {
+    let interval = 0.1;
+    // if (ui.moveBG) {
+    //   let x1 = noise(x + interval, y, frameCount * 0.01);
+    //   let x2 = noise(x - interval, y, frameCount * 0.01);
+    //   let y1 = noise(x, y + interval, frameCount * 0.01);
+    //   let y2 = noise(x, y - interval, frameCount * 0.01);
+    // }
+    // else{
+      let x1 = noise(x + interval, y);
+      let x2 = noise(x - interval, y);
+      let y1 = noise(x, y + interval);
+      let y2 = noise(x, y - interval);
+    // }
+
+
+    let dx = (x1 - x2)/ (2 * interval);
+    let dy = (y1 - y2)/ (2 * interval);
+
+    return createVector(dx, dy);
+  }
+
   update() {
-    this.field = this.currentField();
-    if (this.field == undefined) {
-      return;
+    if (ui.southEarth) {
+      this.speed = this.calDirection(this.pos.x * scale, this.pos.y * scale).rotate(-PI/3);
+    }else{
+      this.speed = this.calDirection(this.pos.x * scale, this.pos.y * scale).rotate(PI/3);
     }
-    text(this.field.fieldNum, this.pos.x, this.pos.y);
-    let force = this.field.vector.copy();
-    force.mult(1);
-    this.speed.add(force);
-    this.pos.add(this.speed);
+    this.pos.add(this.speed.mult(5));
+    this.lifecount++;
+    // console.log(this.speed.mag());
   }
-
-  currentField() {
-    let x = floor(this.pos.x / blockSize);
-    let y = floor(this.pos.y / blockSize);
-    if (x < 0 || x > wBlockNum || y < 0 || y > hBlockNum) {
-      return fields[-1];
-    }
-    return fields[x + y * (wBlockNum + 1)];
-  }
-
 
   isAlive() {
-    if (this.pos.x < 0 || this.pos.x > windowWidth || this.pos.y < 0 || this.pos.y > windowHeight) {
+    if (this.pos.x < 0 || this.pos.x > frame1.width || this.pos.y < 0 || this.pos.y > frame1.height) {
+      return false;
+    }
+    if (this.lifecount > 10 && this.speed.mag() < 0.3) {
       return false;
     }
     return true;
