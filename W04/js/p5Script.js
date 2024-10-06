@@ -1,13 +1,17 @@
 let frame1
 
 function setup() {
-    frame1 = createCanvas(640, 480);
+    frame1 = createCanvas(windowWidth, windowHeight);
     frame1.parent('p5Container');
-    background(220);
+    cursor('none');
+    // background(220);
 }
 
 function draw() {
-    background(220);
-    ellipse(mouseX, mouseY, 50, 50);
+    clear();
+    // translate(frame1.width/2, frame1.height/2);
+    fill(255 - speed*255);
+    noStroke();
+    circle(mouseX, mouseY, 30 - speed*30);
     // noLoop();
 }

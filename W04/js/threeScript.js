@@ -3,7 +3,7 @@ let camera, renderer;
 let controls;
 let cube, sphere;
 
-let mouseX = 0, mouseY = 0;
+let mousex = 0, mousey = 0;
 const windowHalfX = window.innerWidth / 2;
 const windowHalfY = window.innerHeight / 2;
 
@@ -14,6 +14,13 @@ let speed = 1;
 let lines = [];
 let amount = 1000;
 
+let glassMaterial = new THREE.MeshNormalMaterial({
+    color: 0xda70d6,
+    transparent: true,
+    opacity: 0,
+    side: THREE.DoubleSide
+});
+
 class Line {
     constructor(z, color) {
         this.material = new THREE.LineBasicMaterial({
@@ -23,10 +30,10 @@ class Line {
             linejoin: 'round' //ignored by WebGLRenderer
         });
         this.material.color = (new THREE.Color(Math.random() * 0xffffff));
-        this.material.color.setHSL(Math.random()* 0.4 + 0.5, 0.9, 0.5);
+        this.material.color.setHSL(Math.random() * 0.4 + 0.5, 0.9, 0.5);
         this.positionX = randint(-10, 10);
         this.positionY = randint(-10, 10);
-        this.positionZ = z || randint(-100, 10);
+        this.positionZ = z || randint(-100, 40);
         this.positionDie = randint(8, 20);
         this.length = randint(2, 5);
         this.points = [];
@@ -35,13 +42,14 @@ class Line {
         this.geometry = new THREE.BufferGeometry().setFromPoints(this.points);
         this.mesh = new THREE.Line(this.geometry, this.material);
         this.status = true;
+        this.speedVar = randint(0.9, 1.1);
     }
 
 
 
     update() {
-        this.mesh.position.z += speed;
-        if (this.mesh.position.z > -this.positionZ + 20) {
+        this.mesh.position.z += (speed * this.speedVar);
+        if (this.mesh.position.z > -this.positionZ + 40) {
             this.status = false;
         }
     }
@@ -75,6 +83,8 @@ function setupThree() {
         scene.add(lines[i].mesh);
     }
 
+    cube1 = getCube(1.5, 1.5, 1.5);
+    scene.add(cube1);
     camera.position.z = 5;
 
     light.position.set(0, 5, 10);
@@ -101,23 +111,31 @@ function animate() {
             lines[i].update();
         }
     }
+
     spdControl();
     // Rotate the camera based on mouse position
-    camera.position.x -= (mouseX + camera.position.x) * 0.05;
-    camera.position.y -= (-mouseY + camera.position.y) * 0.05;
+    camera.position.x -= (mousex * 1.5 + camera.position.x) * 0.05;
+    camera.position.y -= (-mousey * 1.5 + camera.position.y) * 0.05;
     camera.lookAt(scene.position);
     renderer.render(scene, camera);
-    console.log(mouseX, mouseY);
+    // console.log(mouseX, mouseY);
 }
 
 function spdControl() {
-    if (Math.abs(mouseX) > 1 || Math.abs(mouseY) > 1) {
+    if (Math.abs(mousex) > 1.5 || Math.abs(mousey) > 1.5) {
         if (speed >= 0.04) {
             speed -= 0.015;
         }
+        if (glassMaterial.opacity < 0.9) {
+            glassMaterial.opacity += 0.01;
+        }
+
     } else {
         if (speed < 1) {
             speed += 0.015;
+        }
+        if (glassMaterial.opacity > 0) {
+            glassMaterial.opacity -= 0.01;
         }
     }
 }
@@ -163,8 +181,8 @@ function randint(min, max) {
 }
 
 function onMouseMove(event) {
-    mouseX = (event.clientX - windowHalfX) / 100;
-    mouseY = (event.clientY - windowHalfY) / 100;
+    mousex = (event.clientX - windowHalfX) / 100;
+    mousey = (event.clientY - windowHalfY) / 100;
 }
 
 window.addEventListener('resize', function () {
