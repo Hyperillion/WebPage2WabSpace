@@ -9,8 +9,6 @@ let ui = {
   southEarth: false,
 }
 
-
-
 function setup() {
   frame1 = createCanvas(windowWidth, windowHeight);
   img = noiseImage();
