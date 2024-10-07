@@ -77,7 +77,7 @@ function initThree() {
 }
 
 function setupThree() {
-    scene.background = new THREE.Color(0x0f0f0f);
+    scene.background = new THREE.Color(0x000);
     for (let i = 0; i < amount; i++) {
         lines.push(new Line());
         scene.add(lines[i].mesh);
@@ -114,11 +114,15 @@ function animate() {
 
     spdControl();
     // Rotate the camera based on mouse position
-    camera.position.x -= (mousex * 1.5 + camera.position.x) * 0.05;
-    camera.position.y -= (-mousey * 1.5 + camera.position.y) * 0.05;
-    camera.lookAt(scene.position);
+    camControl();
     renderer.render(scene, camera);
     // console.log(mouseX, mouseY);
+}
+
+function camControl() {
+    camera.position.x -= (mousex + camera.position.x) * 0.05;
+    camera.position.y -= (-mousey + camera.position.y) * 0.05;
+    camera.lookAt(scene.position);
 }
 
 function spdControl() {
