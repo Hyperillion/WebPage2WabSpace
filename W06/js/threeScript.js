@@ -83,7 +83,7 @@ class Particle {
         );
         this.velocity.add(speedChange);
         this.mesh.position.add(this.velocity.clone().multiplyScalar(speed * this.speedVar));
-        if (this.mesh.position.x > 40 || this.mesh.position.x < -40 || this.mesh.position.y > 40 || this.mesh.position.y < -40 || this.mesh.position.z > 40 || this.mesh.position.z < -40) {
+        if (this.mesh.position.x > 20 || this.mesh.position.x < -20 || this.mesh.position.y > 20 || this.mesh.position.y < -20 || this.mesh.position.z > 20 || this.mesh.position.z < -20) {
             this.status = false;
             // this.bufferGeometry.dispose();
         }
@@ -248,7 +248,7 @@ function getCube(width, height, depth) {
 }
 
 function getSphere(dia) {
-    const geometry = new THREE.SphereGeometry(dia, 32, 16);
+    const geometry = new THREE.SphereGeometry(dia, 16, 16);
     const material = particleMaterial;
     // material.color = (new THREE.Color(Math.random() * 0xffffff));
     // material.color.setHSL(Math.random() * 0.4 + 0.5, 0.9, 0.5);
