@@ -47,7 +47,7 @@ class Particle {
         this.geometry = new THREE.BufferGeometry();
         // geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         this.geometry = new THREE.BufferGeometry().setFromPoints(this.points);
-        this.mesh = new THREE.Points(this.geometry, this.material);
+        this.mesh = new THREE.Points(this.geometry, this.material);z
         this.mesh.position.set(this.positionX, this.positionY, this.positionZ);
         scene.add(this.mesh);
         this.status = true;
