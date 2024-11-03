@@ -56,12 +56,10 @@ let inkwashMaterial = new THREE.ShaderMaterial({
 
     void main() {
       vec3 displayColor;
-      //display color according to the angle between the camera direction and the normal of the surface
-      //calculate the vector of camera position to the pixel position
+      float noise = rand(vPosition.xy);
       vec3 cameraAngle = normalize(cameraPosition - vPosition);
       float angle = dot(normalize(vNormal), cameraAngle);
-      //grade the angle into 5 levels, and each level has a different color from pure white to pure black
-      float noise = rand(vPosition.xy);
+      displayColor = mix(colorA, colorB, 1.0 - abs(angle));
       // float noisedAngle = abs(angle)+ (noise - 0.5) * 0.08;
       // if (noisedAngle > 0.5) {
       //   displayColor = colorA;
@@ -75,7 +73,7 @@ let inkwashMaterial = new THREE.ShaderMaterial({
       //   displayColor = colorB;
       // }
       
-      displayColor = mix(colorA, colorB, 1.0 - abs(angle));
+      
       vec2 reflectUv = vUv - cameraAngle.xy * 0.5;
       vec4 textureColor = texture2D(coefficientTexture, gl_FragCoord.xy/size.xy);
       float r = clamp(displayColor.r + textureColor.r - 1.0, 0.0, 1.0);
@@ -106,7 +104,6 @@ let inkwashMaterial = new THREE.ShaderMaterial({
         g = 0.0;
       }
 
-
       if (b > 0.4) {
         b = 0.9;
       } else if (b > 0.2) {
@@ -118,8 +115,9 @@ let inkwashMaterial = new THREE.ShaderMaterial({
       } else {
         b = 0.0;
       }
-      gl_FragColor = vec4(r, g, b, 1.0 - r);
-      // gl_FragColor = vec4(r, g, b, 1.0);
+      // gl_FragColor = vec4(r, g, b, 1.0 - r);
+      // gl_FragColor = vec4(r, r, r, 1.0);
+      gl_FragColor = vec4(displayColor, 1.0);
 
     }
   `,
