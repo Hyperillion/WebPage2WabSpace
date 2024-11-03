@@ -29,10 +29,19 @@ let glassMaterial = new THREE.MeshNormalMaterial({
 });
 let pointLightMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
 let centerObjMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
-let particleMaterial =  new THREE.MeshPhysicalMaterial({  
-    roughness: 0,  
+let particleMaterial = new THREE.MeshPhysicalMaterial({
+    roughness: 0,
     transmission: 0.99, // Add transparency
-  });
+});
+
+// let gui;
+// let ui = {
+//     particleSize: 0.03,
+//     // ambientLightColor: 0xffffff,
+//     // pointLightColor: 0xffffff,
+//     pointLightIntensity: 1,
+//     ambientLightIntensity: 1,
+// }
 
 class Particle {
     constructor(x, y, z) {
@@ -51,12 +60,12 @@ class Particle {
         // this.material.color.setHSL(Math.random() * 0.4 + 0.5, 0.9, 0.5);
         this.position = new THREE.Vector3(x || randint(0, 0), y || randint(0, 0), z || randint(0, 0));
         this.velocity = new THREE.Vector3(0, 0, 0);
-        this.material = new THREE.MeshPhysicalMaterial({  
-            roughness: 0,  
+        this.material = new THREE.MeshPhysicalMaterial({
+            roughness: 0,
             transmission: 0.99, // Add transparency
-          });
-          this.material.color = (new THREE.Color(Math.random() * 0xffffff));
-          this.material.color.setHSL(Math.random() * 0.4 + 0.5, 0.9, 0.5);
+        });
+        this.material.color = (new THREE.Color(Math.random() * 0xffffff));
+        this.material.color.setHSL(Math.random() * 0.4 + 0.5, 0.9, 0.5);
         // this.points = [];
         // this.points.push(new THREE.Vector3(this.position.x, this.position.y, this.position.z));
         // this.geometry = new THREE.BufferGeometry();
@@ -83,7 +92,7 @@ class Particle {
         );
         this.velocity.add(speedChange);
         this.mesh.position.add(this.velocity.clone().multiplyScalar(speed * this.speedVar));
-        if (this.mesh.position.x > 20 || this.mesh.position.x < -20 || this.mesh.position.y > 20 || this.mesh.position.y < -20 || this.mesh.position.z > 20 || this.mesh.position.z < -20) {
+        if (this.mesh.position.x > 10 || this.mesh.position.x < -10 || this.mesh.position.y > 10 || this.mesh.position.y < -10 || this.mesh.position.z > 10 || this.mesh.position.z < -10) {
             this.status = false;
             // this.bufferGeometry.dispose();
         }
@@ -94,6 +103,12 @@ initThree()
 
 function initThree() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    // gui = new dat.GUI();
+    // gui.add(ui, 'particleSize', 0.01, 0.1).listen();
+    // // gui.add(ui, 'ambientLightColor', 0x000000, 0xffffff);
+    // // gui.add(ui, 'pointLightColor', 0x000000, 0xffffff);
+    // gui.add(ui, 'pointLightIntensity', 0, 10).listen();
+    // gui.add(ui, 'ambientLightIntensity', 0, 10).listen();
 
     nearClippingPlane = 0.1;
     farClippingPlane = 1000;
@@ -172,7 +187,7 @@ function animate() {
         }
     }
 
-    
+
     spdControl();
     // Rotate the camera based on mouse position
     camControl();
@@ -192,16 +207,17 @@ function camControl() {
 
 function spdControl() {
     if (Math.abs(mousex) > 1.5 || Math.abs(mousey) > 1.5) {
-        if (speed >= 0.04) {
-            speed -= 0.015;
+        if (speed < 1) {
+            speed += 0.015;
         }
         // if (glassMaterial.opacity > 0) {
         //     glassMaterial.opacity -= 0.01;
         // }
 
     } else {
-        if (speed < 1) {
-            speed += 0.015;
+
+        if (speed >= 0.04) {
+            speed -= 0.015;
         }
         // if (glassMaterial.opacity < 0.9) {
         //     glassMaterial.opacity += 0.01;

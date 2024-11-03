@@ -85,7 +85,6 @@ function setupThree() {
 
     cube1 = getCube(1.5, 1.5, 1.5);
     scene.add(cube1);
-    camera.position.z = 5;
 
     light.position.set(0, 5, 10);
     scene.add(light);
