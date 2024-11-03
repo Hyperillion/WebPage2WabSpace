@@ -60,6 +60,7 @@ let inkwashMaterial = new THREE.ShaderMaterial({
       vec3 cameraAngle = normalize(cameraPosition - vPosition);
       float angle = dot(normalize(vNormal), cameraAngle);
       displayColor = mix(colorA, colorB, 1.0 - abs(angle));
+
       // float noisedAngle = abs(angle)+ (noise - 0.5) * 0.08;
       // if (noisedAngle > 0.5) {
       //   displayColor = colorA;
@@ -72,7 +73,6 @@ let inkwashMaterial = new THREE.ShaderMaterial({
       // } else {
       //   displayColor = colorB;
       // }
-      
       
       vec2 reflectUv = vUv - cameraAngle.xy * 0.5;
       vec4 textureColor = texture2D(coefficientTexture, gl_FragCoord.xy/size.xy);
@@ -115,9 +115,9 @@ let inkwashMaterial = new THREE.ShaderMaterial({
       } else {
         b = 0.0;
       }
-      // gl_FragColor = vec4(r, g, b, 1.0 - r);
+      gl_FragColor = vec4(r, g, b, 1.0 - r);
       // gl_FragColor = vec4(r, r, r, 1.0);
-      gl_FragColor = vec4(displayColor, 1.0);
+      // gl_FragColor = vec4(displayColor, 1.0);
 
     }
   `,
