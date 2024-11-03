@@ -115,7 +115,7 @@ let inkwashMaterial = new THREE.ShaderMaterial({
       } else {
         b = 0.0;
       }
-      gl_FragColor = vec4(r, g, b, 1.0 - r);
+      gl_FragColor = vec4( r,  g,  b, 1.0 - r);
       // gl_FragColor = vec4(r, r, r, 1.0);
       // gl_FragColor = vec4(displayColor, 1.0);
 
