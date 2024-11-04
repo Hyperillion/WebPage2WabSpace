@@ -7,6 +7,7 @@ let PARAMS = {
   curveFactor: 0.5,
   transparent: false,
   depthTest: true,
+  colorNoise: false,
 }
 const pane = new Pane();
 let light, lightMesh;
@@ -27,7 +28,8 @@ let inkwashMaterial = new THREE.ShaderMaterial({
       texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping;
       // texture.repeat.set(2, 2);
     })},
-    size: { type: "vec2", value: new THREE.Vector2(window.innerWidth/1, window.innerHeight/1) }
+    size: { type: "vec2", value: new THREE.Vector2(window.innerWidth/1, window.innerHeight/1) },
+    colorNoise: {type: "bool", value: false},
   },
   vertexShader: `
     varying vec3 vNormal;
@@ -53,6 +55,7 @@ let inkwashMaterial = new THREE.ShaderMaterial({
     varying vec2 vUv;
     uniform vec3 color;
     uniform vec2 size;
+    uniform bool colorNoise;
 
     void main() {
       vec3 displayColor;
@@ -115,8 +118,12 @@ let inkwashMaterial = new THREE.ShaderMaterial({
       } else {
         b = 0.0;
       }
-      gl_FragColor = vec4( r,  g,  b, 1.0 - r);
-      // gl_FragColor = vec4(r, r, r, 1.0);
+
+      if (colorNoise) {
+        gl_FragColor = vec4( r,  g,  b, 1.0 - r);
+      } else {
+        gl_FragColor = vec4(r, r, r, 1.0);
+      }
       // gl_FragColor = vec4(displayColor, 1.0);
 
     }
@@ -134,6 +141,7 @@ function setupThree() {
   pane.addBinding(PARAMS, "colorB");
   pane.addBinding(PARAMS, "transparent");
   pane.addBinding(PARAMS, "depthTest");
+  pane.addBinding(PARAMS, "colorNoise");
 
   // change the background color
   renderer.setClearColor("#aaaaaa");
@@ -203,6 +211,8 @@ function updateThree() {
   // inkwashMaterial.uniforms.time.value = frame * 0.01;
   inkwashMaterial.transparent = PARAMS.transparent;
   inkwashMaterial.depthTest = PARAMS.depthTest;
+
+  inkwashMaterial.uniforms.colorNoise.value = PARAMS.colorNoise;
 
   pane.refresh();
   if (PARAMS.test) {

@@ -128,7 +128,7 @@ let inkwashMaterial = new THREE.ShaderMaterial({
 });
 
 function setupThree() {
-  loadOBJ("assets/castle.obj");
+  loadOBJ("assets/city.obj");
   pane.addBinding(PARAMS, "test");
   pane.addBinding(PARAMS, "colorA");
   pane.addBinding(PARAMS, "colorB");
