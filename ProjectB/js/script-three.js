@@ -10,7 +10,7 @@ function initThree() {
   const fov = 75;
   const aspectRatio = window.innerWidth / window.innerHeight;
   const near = 0.1;
-  const far = 10000;
+  const far = 50000;
   camera = new THREE.PerspectiveCamera(fov, aspectRatio, near, far);
   camera.position.z = 1000;
 

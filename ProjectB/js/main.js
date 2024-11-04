@@ -77,8 +77,8 @@ let inkwashMaterial = new THREE.ShaderMaterial({
       vec2 reflectUv = vUv - cameraAngle.xy * 0.5;
       vec4 textureColor = texture2D(coefficientTexture, gl_FragCoord.xy/size.xy);
       float r = clamp(displayColor.r + textureColor.r - 1.0, 0.0, 1.0);
-      float g = clamp(displayColor.g + textureColor.g - 1.0, 0.0, 1.0)+ (rand(vPosition.xz) - 0.5) * 0.1;
-      float b = clamp(displayColor.b + textureColor.b - 1.0, 0.0, 1.0)+ (rand(vPosition.yz) - 0.5) * 0.1;
+      float g = clamp(displayColor.g + textureColor.g - 1.0, 0.0, 1.0)+ (rand(vPosition.xz) - 0.5) * 0.2;
+      float b = clamp(displayColor.b + textureColor.b - 1.0, 0.0, 1.0)+ (rand(vPosition.yz) - 0.5) * 0.2;
 
       if (r > 0.4) {
         r = 0.9;
