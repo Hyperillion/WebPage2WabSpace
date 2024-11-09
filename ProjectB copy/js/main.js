@@ -80,14 +80,14 @@ let inkwashMaterial = new THREE.ShaderMaterial({
       float g = clamp(displayColor.g + textureColor.g - 1.0, 0.0, 1.0)+ (rand(vPosition.xz) - 0.5) * 0.2;
       float b = clamp(displayColor.b + textureColor.b - 1.0, 0.0, 1.0)+ (rand(vPosition.yz) - 0.5) * 0.2;
 
-      if (r > 0.5) {
-        r = 0.9;
-      } else if (r > 0.4) {
+      if (r > 0.7) {
+        r = 0.8;
+      } else if (r > 0.5) {
         r = 0.6;
       } else if (r > 0.3) {
-        r = 0.2;
+        r = 0.4;
       } else if (r > 0.2) {
-        r = 0.1;
+        r = 0.2;
       } else {
         r = 0.0;
       }
@@ -116,13 +116,13 @@ let inkwashMaterial = new THREE.ShaderMaterial({
         b = 0.0;
       }
       // gl_FragColor = vec4( r,  g,  b, 1.0 - r);
-      gl_FragColor = vec4(r, r, r, 1.0);
+      gl_FragColor = vec4(r, r, r, 1.0 - r);
       // gl_FragColor = vec4(displayColor, 1.0);
 
     }
   `,
   side: THREE.DoubleSide,
-  // wireframe: true,
+  wireframe: true,
   transparent: PARAMS.transparent,
   depthTest: PARAMS.depthTest,
 });
