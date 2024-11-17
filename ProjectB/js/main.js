@@ -9,12 +9,14 @@ let PARAMS = {
   depthTest: true,
   colorNoise: true,
   wireframe: false,
-  fogColor: "#ffffff",
+  fogColor: "#bababa",
   fog: true,
   frame: frame,
   mountainHeight: 25,
+  fov: 75,
 }
 const pane = new Pane();
+let controls;
 const WORLD_HALF = 1000;
 let light, lightMesh;
 let sculpture;
@@ -28,6 +30,8 @@ let globalXoffset = 0;
 let globalYoffset = 0;
 let images = [];
 let imageGrp;
+let movementSpeed = 0.1;
+
 
 
 //write a custom shader for the material
@@ -153,6 +157,7 @@ let inkwashMaterial = new THREE.ShaderMaterial({
   transparent: PARAMS.transparent,
   depthTest: PARAMS.depthTest,
   fog: true,
+  // shading: THREE.FlatShading,
 });
 
 //write a custom shader for the material
@@ -282,26 +287,54 @@ let inkwashMaterialRoom = new THREE.ShaderMaterial({
 function setupThree() {
   loadGLTF("assets/andyroom.glb");
   loadOBJ("assets/gummy.obj");
-  pane.addBinding(PARAMS, "test");
-  pane.addBinding(PARAMS, "colorA");
-  pane.addBinding(PARAMS, "colorB");
-  pane.addBinding(PARAMS, "transparent");
-  pane.addBinding(PARAMS, "depthTest");
-  pane.addBinding(PARAMS, "wireframe");
-  pane.addBinding(PARAMS, "colorNoise");
+  const terrain = pane.addFolder({
+    title: 'terrain',
+  });
+  const shader = pane.addFolder({
+    title: 'shader',
+  });
+  const cameraFolder = pane.addFolder({
+    title: 'camera',
+  });
+  const dev = pane.addFolder({
+    title: 'dev',
+  });
+
+  dev.addBinding(PARAMS, "test");
+  shader.addBinding(PARAMS, "colorA");
+  shader.addBinding(PARAMS, "colorB");
+  shader.addBinding(PARAMS, "fogColor");
+  shader.addBinding(PARAMS, "transparent");
+  shader.addBinding(PARAMS, "depthTest");
+  shader.addBinding(PARAMS, "wireframe");
+  shader.addBinding(PARAMS, "colorNoise");
   // pane.addBinding(PARAMS, "frame");
-  pane.addBinding(PARAMS, "fogColor");
-
   //limit the height of the mountain from 5 to 40
-  pane.addBinding(PARAMS, "mountainHeight", { min: 0, max: 30 });
+  terrain.addBinding(PARAMS, "mountainHeight", { min: 0, max: 30 });
+  cameraFolder.addBinding(PARAMS, "fov", { min: 0, max: 180 });
 
+  controls = new MapControls(camera, renderer.domElement);
+  controls.minDistance = 0;
+  controls.maxDistance = 100;
+  // controls.distance = 0;
+  // controls.minPolarAngle = -Math.PI / 2;
+  // controls.maxPolarAngle = Math.PI;
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+  controls.rotateSpeed = 0.5;
+  controls.panSpeed = 1;
+  controls.zoomSpeed = 0.15;
+  controls.listenToKeyEvents(window);
+  controls.keys = {
+    LEFT: 'KeyA', //left arrow
+    UP: 'KeyW', // up arrow
+    RIGHT: 'KeyD', // right arrow
+    BOTTOM: 'KeyS' // down arrow
+  }
+  // window.listenToKeyEvents = true;
 
   // change the background color
   renderer.setClearColor(PARAMS.fogColor);
-  //add fog to the scene
-  // scene.fog = new THREE.Fog(PARAMS.fogColor, 1, 1000);
-  //change the density of the fog
-  // scene.fog.density = 100;
 
   // add ambient light
   ambiLight = new THREE.AmbientLight("#FFFFFF");
@@ -376,6 +409,8 @@ function setupThree() {
 
 
 function updateThree() {
+  controls.update();
+
   renderer.setClearColor(PARAMS.fogColor);
   // let angle = frame * 0.01;
   // let radDist = 500;
@@ -388,9 +423,12 @@ function updateThree() {
     image.update();
   }
 
+  
+  // camera.position.z --;
   updateCameraAngle();
   updateShader();
-  camera.lookAt(new THREE.Vector3(-9, -4, -5));
+  cameraControls();
+  // camera.lookAt(new THREE.Vector3(-9, -4, -5));
   // inkwashMaterial.uniforms.time.value = frame * 0.01;
 
   let posArray = plane.geometry.attributes.position.array;
@@ -450,12 +488,56 @@ function mousePressed() {
 
 }
 
+function cameraControls() {
+  //if press space camera will move up
+  if (keyIsDown(32)) {
+    camera.position.y += 0.1;
+  }
+  //if press control camera will move down
+  if (keyIsDown(17)) {
+    camera.position.y -= 0.1;
+  }
+  //change camera fov according to PARAMS.fov
+  camera.fov = PARAMS.fov;
+  camera.updateProjectionMatrix();
+  camera.updateMatrixWorld();
+  //make camera look at the center of the world
+  // camera.lookAt(0, 0, 0);
+}
+
+// function moveCamera(direction) {
+//   vector = cameraDirection.clone();
+//   switch (direction) {
+//     case "forward":
+//       // camera.getWorldDirection(vector);
+//       vector.multiplyScalar(movementSpeed);
+//       camera.position.add(vector);
+//       break;
+//     case "backward":
+//       // camera.getWorldDirection(vector);
+//       vector.multiplyScalar(-movementSpeed);
+//       camera.position.add(vector);
+//       break;
+//     case "left":
+//       // camera.getWorldDirection(vector);
+//       vector.cross(camera.up).normalize();
+//       vector.multiplyScalar(+movementSpeed);
+//       camera.position.add(vector);
+//       break;
+//     case "right":
+//       // camera.getWorldDirection(vector);
+//       vector.cross(camera.up).normalize();
+//       vector.multiplyScalar(-movementSpeed);
+//       camera.position.add(vector);
+//       break;
+//   }
+//   controls.update();
+// }
+
 function updateCameraAngle() {
   //calculate the vector of current camera direction
   camera.getWorldDirection(cameraDirection);
   //calculate the angle of the camera direction
-
-
   //draw a line in the center of the world that represents the camera direction
   // let lineGeometry = new THREE.BufferGeometry();
   // lineGeometry.setFromPoints([cameraDirection, new THREE.Vector3(0, 0, 0)]);
