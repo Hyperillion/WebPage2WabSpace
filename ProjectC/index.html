@@ -25,7 +25,6 @@
         "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.168.0/examples/jsm/"
       }
     }
-
   </script>
 
   <script type="module">
@@ -38,6 +37,10 @@
     import { BoxLineGeometry } from "three/addons/geometries/BoxLineGeometry.js";
     import { XRButton } from "three/addons/webxr/XRButton.js";
     import { XRControllerModelFactory } from "three/addons/webxr/XRControllerModelFactory.js";
+    import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
+    import { HTMLMesh } from 'three/addons/interactive/HTMLMesh.js';
+    import { InteractiveGroup } from 'three/addons/interactive/InteractiveGroup.js';
+    
     // import { SimplexNoise } from 'https://cdn.skypack.dev/simplex-noise';
     window.THREE = THREE;
     window.OrbitControls = OrbitControls;
@@ -48,6 +51,10 @@
     window.BoxLineGeometry = BoxLineGeometry;
     window.XRButton = XRButton;
     window.XRControllerModelFactory = XRControllerModelFactory;
+    window.XRHandModelFactory = XRHandModelFactory;
+    window.HTMLMesh = HTMLMesh;
+    window.InteractiveGroup = InteractiveGroup;
+
     // window.SimplexNoise = SimplexNoise;
 
   </script>

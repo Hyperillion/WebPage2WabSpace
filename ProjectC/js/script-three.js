@@ -13,27 +13,11 @@ function initThree() {
   const near = 0.1;
   const far = 5000;
   camera = new THREE.PerspectiveCamera(fov, aspectRatio, near, far);
-  // camera.position.z = 0;
-  // camera.position.y = -100;
-  // camera.position.x = -10;
-  //make camera look straight at the front
-  // camera.lookAt(0, 0, 0);
-  // camera.position.z = 0;
-
-  //change camera pivot
-
-  // const pivot = new THREE.Object3D();
-  // scene.add(pivot);
-  // pivot.add(camera);
-  // pivot.position.set(-9, -4, -5);
-
-  // camera.position.z = 0;
-  // camera.position.y = 0;
-  // camera.position.x = 8;
 
   renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
-
+  renderer.xr.enabled = true;
+  
   container = document.getElementById("container-three");
   container.appendChild(renderer.domElement);
 
