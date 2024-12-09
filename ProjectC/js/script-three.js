@@ -13,9 +13,9 @@ function initThree() {
   const near = 0.1;
   const far = 5000;
   camera = new THREE.PerspectiveCamera(fov, aspectRatio, near, far);
-  camera.position.z = 0;
-  camera.position.y = -5;
-  camera.position.x = -10;
+  // camera.position.z = 0;
+  // camera.position.y = -100;
+  // camera.position.x = -10;
   //make camera look straight at the front
   // camera.lookAt(0, 0, 0);
   // camera.position.z = 0;

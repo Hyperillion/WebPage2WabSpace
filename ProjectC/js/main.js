@@ -34,6 +34,7 @@ let movementSpeed = 0.1;
 
 
 
+
 //write a custom shader for the material
 let inkwashMaterial = new THREE.ShaderMaterial({
   uniforms: {
@@ -285,8 +286,11 @@ let inkwashMaterialRoom = new THREE.ShaderMaterial({
 });
 
 function setupThree() {
-  loadGLTF("assets/andyroom.glb");
-  loadOBJ("assets/gummy.obj");
+  setupWebXR();
+
+  room = loadGLTF("assets/andyroom.glb");
+  // scene.add(room);
+  // loadOBJ("assets/gummy.obj");
   const terrain = pane.addFolder({
     title: 'terrain',
   });
@@ -340,71 +344,21 @@ function setupThree() {
   ambiLight = new THREE.AmbientLight("#FFFFFF");
   scene.add(ambiLight);
 
-  // // add point light
-  // light = getPointLight("#FFFFFF");
-  // scene.add(light);
-
-  // // add a small sphere for the light
-  // lightMesh = getBasicSphere();
-  // light.add(lightMesh);
-  // lightMesh.scale.set(10, 10, 10);
-
-  // add meshes
-  const cube1 = getPhongBox();
-  cube1.position.set(0, -100, 0);
-  cube1.scale.set(200, 100, 200);
-
-  const cube2 = getPhongBox();
-  cube2.position.set(0, 100, 0);
-  cube2.scale.set(50, 300, 50);
-
-  const ball = getPhongSphere();
-  ball.scale.set(100, 100, 100);
-
   plane = getPlane();
-  plane.position.set(0, 0, 0);
+  plane.position.set(0, 10, 0);
   // plane.rotation.x = Math.PI / 2;
   scene.add(plane);
 
-  const torus = getTorus();
-  torus.position.set(0, 250, 0);
-  // scene.add(torus);
-
   sculpture = new THREE.Group();
-  // scene.add(sculpture);
-  // sculpture.add(cube1);
-  // sculpture.add(cube2);
-  sculpture.add(ball);
-  // sculpture.add(plane);
-  sculpture.add(torus);
 
   imageGrp = new THREE.Group();
   scene.add(imageGrp);
 
-  // const image1 = getImage("assets/images/1.png");
-  // images.add(image1);
-  // image1.position.set(random(-9, -10), random(-4, -0), random(-3, -7));
-
-
-  // const image2 = getImage("assets/images/2.png");
-  // images.add(image2);
-  // image2.position.set(random(-9, -10), random(-4, -0), random(-3, -7));
-
-  // const image3 = getImage("assets/images/3.png");
-  // images.add(image3);
-  // image3.position.set(random(-9, -10), random(-4, -0), random(-3, -7));
-
-  // const image4 = getImage("assets/images/4.png");
-  // images.add(image4);
-  // image4.position.set(random(-9, -10), random(-4, -0), random(-3, -7));
-
-  // const image5 = getImage("assets/images/5.png");
-  // images.add(image5);
-  // image5.position.set(random(-9, -10), random(-4, -0), random(-3, -7));
   for (let i = 0; i < 5; i++) {
     images.push(new Image("assets/images/" + (i + 1) + ".png"));
   }
   inkwashMaterialRoom.needsUpdate = true;
+
 }
 
 
@@ -457,15 +411,15 @@ function updateThree() {
   plane.geometry.computeVertexNormals();
   plane.geometry.attributes.position.needsUpdate = true;
 
-  if (room !== undefined) {
-    room.scale.set(10, 10, 10);
-    // model.rotation.x += 0.01;
-    // room.rotation.y += 0.01;
-    room.position.y = 0;
-    room.position.z = 0;
-    //camera look at the room
-    // camera.lookAt(room.position);
-  }
+  // if (room !== undefined) {
+  //   room.scale.set(10, 10, 10);
+  //   // model.rotation.x += 0.01;
+  //   // room.rotation.y += 0.01;
+  //   room.position.y = 0;
+  //   room.position.z = 0;
+  //   //camera look at the room
+  //   // camera.lookAt(room.position);
+  // }
 
   PARAMS.frame = frame;
   pane.refresh();
@@ -505,46 +459,10 @@ function cameraControls() {
   // camera.lookAt(0, 0, 0);
 }
 
-// function moveCamera(direction) {
-//   vector = cameraDirection.clone();
-//   switch (direction) {
-//     case "forward":
-//       // camera.getWorldDirection(vector);
-//       vector.multiplyScalar(movementSpeed);
-//       camera.position.add(vector);
-//       break;
-//     case "backward":
-//       // camera.getWorldDirection(vector);
-//       vector.multiplyScalar(-movementSpeed);
-//       camera.position.add(vector);
-//       break;
-//     case "left":
-//       // camera.getWorldDirection(vector);
-//       vector.cross(camera.up).normalize();
-//       vector.multiplyScalar(+movementSpeed);
-//       camera.position.add(vector);
-//       break;
-//     case "right":
-//       // camera.getWorldDirection(vector);
-//       vector.cross(camera.up).normalize();
-//       vector.multiplyScalar(-movementSpeed);
-//       camera.position.add(vector);
-//       break;
-//   }
-//   controls.update();
-// }
 
 function updateCameraAngle() {
   //calculate the vector of current camera direction
   camera.getWorldDirection(cameraDirection);
-  //calculate the angle of the camera direction
-  //draw a line in the center of the world that represents the camera direction
-  // let lineGeometry = new THREE.BufferGeometry();
-  // lineGeometry.setFromPoints([cameraDirection, new THREE.Vector3(0, 0, 0)]);
-  // let lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
-  // let line = new THREE.Line(lineGeometry, lineMaterial);
-  // scene.add(line);
-  // inkwashMaterial.uniforms.cameraAngle.value = camera.rotation.x;
 }
 
 function updateShader() {
@@ -593,10 +511,6 @@ function getPlane() {
 
 function getPhongBox() {
   const geometry = new THREE.BoxGeometry(1, 1, 1);
-  // const material = new THREE.MeshPhongMaterial({
-  //   color: "#999999",
-  //   shininess: 100
-  // });
   const material = inkwashMaterial;
   const mesh = new THREE.Mesh(geometry, material);
   return mesh;
@@ -604,10 +518,6 @@ function getPhongBox() {
 
 function getPhongSphere() {
   const geometry = new THREE.SphereGeometry(1, 32, 32);
-  // const material = new THREE.MeshPhongMaterial({
-  //   color: "#999999",
-  //   shininess: 100
-  // });
   const material = inkwashMaterial;
   const mesh = new THREE.Mesh(geometry, material);
   return mesh;
@@ -627,75 +537,38 @@ function getPointLight(color) {
   return light;
 }
 
-function loadOBJ(filepath) {
-  // load .obj file
-  const loader = new OBJLoader(); // NOT! THREE.ObjectLoader();
-
-  loader.load(
-    // resource URL
-    filepath,
-    // onLoad callback
-
-    // Here the loaded data is assumed to be an object
-    function (obj) {
-      // Add the loaded object to the scene
-      bear = obj;
-      for (let child of bear.children) {
-        //child.material = new THREE.MeshBasicMaterial();
-        child.material = inkwashMaterial;
-      }
-      bear.scale.set(100, 100, 100);
-      bear.position.set(0, 0, 0);
-      // scene.add(bear);
-    },
-
-    // onProgress callback
-    function (xhr) {
-      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-    },
-
-    // onError callback
-    function (err) {
-      console.error('An error happened');
-    }
-  );
-}
-
-
 function loadGLTF(filepath) {
   // load .glft file
+  let gltfModel;
   const loader = new GLTFLoader();
 
   loader.load(
     // resource URL
     filepath,
     // onLoad callback
-
-    // Here the loaded data is assumed to be an object
     function (gltfData) {
       // Add the loaded model to the scene
-      room = gltfData.scene;
-      console.log(room);
+      gltfModel = gltfData.scene;
+      console.log(gltfModel);
 
-      //get material of glb file
-
+      // Set material of glb file
       gltfData.scene.traverse((child) => {
         if (child.isMesh) {
           child.geometry.computeVertexNormals();
           child.material = inkwashMaterialRoom;
-          // child.material.color.set("#FFFFFF");
-          // child.castShadow = true;
-          // child.receiveShadow = true;
         }
       });
+      // Scale the model
+      gltfModel.position.set(0, 2, 0);
+      gltfModel.scale.set(1.5, 1.5, 1.5);
+      scene.add(gltfModel);
+      return gltfModel;
 
-      scene.add(room);
-
-      gltfData.animations; // Array<THREE.AnimationClip>
-      gltfData.scene; // THREE.Group
-      gltfData.scenes; // Array<THREE.Group>
-      gltfData.cameras; // Array<THREE.Camera>
-      gltfData.asset; // Object
+      // gltfData.animations; // Array<THREE.AnimationClip>
+      // gltfData.scene; // THREE.Group
+      // gltfData.scenes; // Array<THREE.Group>
+      // gltfData.cameras; // Array<THREE.Camera>
+      // gltfData.asset; // Object
     },
 
     // onProgress callback
@@ -713,8 +586,9 @@ function loadGLTF(filepath) {
 class Image {
   constructor(url) {
     this.mesh = getImage(url);
-    this.mesh.position.set(random(-9, -10), random(-4, -0), random(-3, -7));
+    this.mesh.position.set(random(-1.5, -1.7), random(1.4, 2), random(-0.4, -1.0));
     this.position = this.mesh.geometry.attributes.position;
+    this.mesh.scale.set(0.1, 0.1, 0.1);
     imageGrp.add(this.mesh);
     this.random = random(0, 2*PI);
     this.randomSpd = random(1,2);
@@ -724,7 +598,6 @@ class Image {
   }
 
   update() {
-
     this.position.needsUpdate = true;
     for (let i = 0; i < this.position.array.length; i += 3) {
       let x = this.position.array[i + 0];
